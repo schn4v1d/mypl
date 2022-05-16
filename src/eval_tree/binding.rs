@@ -32,7 +32,7 @@ impl BindingType {
             Atop(_, _) => F,
             Fork(_, _, _) => F,
             Integer(_) => A,
-            Float(_) => F,
+            Float(_) => A,
             PrimitiveFunction(_) => F,
             PrimitiveMonadicOperator(_) => Mop,
             PrimitiveDyadicOperator(_) => Dop,
@@ -55,11 +55,10 @@ fn combine_arrays(x: EvalTree, y: EvalTree) -> EvalTree {
 fn combine_functions(x: EvalTree, y: EvalTree) -> EvalTree {
     use EvalTree::*;
 
-    // match (x, y) {
-    //     _ => todo!(),
-    // }
-
-    todo!()
+    match (x, y) {
+        (l, Atop(m, r)) => Fork(Box::new(l), m, r),
+        (x, y) => Atop(Box::new(x), Box::new(y)),
+    }
 }
 
 pub fn combine(x: EvalTree, y: EvalTree) -> EvalTree {
@@ -151,6 +150,6 @@ fn binding_strength(x: &EvalTree, y: &EvalTree) -> u8 {
         (BindingType::Idx, BindingType::A) => 3,
         (BindingType::Idx, BindingType::F) => 3,
         (BindingType::Idx, BindingType::H) => 3,
-        _ => panic!(),
+        _ => 0,
     }
 }

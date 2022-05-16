@@ -1,4 +1,7 @@
-use std::fmt::{Debug, Display};
+use std::{
+    fmt::{Debug, Display},
+    iter::once,
+};
 
 use self::scalar::Scalar;
 
@@ -59,6 +62,30 @@ impl Array {
             Array::Scalar(s) => Array::Scalar(scalar_fn(s.clone())),
             Array::Vector(v) => {
                 Array::Vector(v.iter().map(|a| a.pervade(scalar_fn.clone())).collect())
+            }
+        }
+    }
+
+    pub fn ravel(&self) -> Array {
+        match self {
+            Array::Scalar(s) => Array::Vector(vec![Array::Scalar(s.clone())]),
+            Array::Vector(v) => Array::Vector(v.clone()),
+        }
+    }
+
+    pub fn catenate(a: Array, b: Array) -> Array {
+        match (a, b) {
+            (Array::Scalar(a), Array::Scalar(b)) => {
+                Array::Vector(vec![Array::Scalar(a), Array::Scalar(b)])
+            }
+            (Array::Scalar(a), Array::Vector(b)) => {
+                Array::Vector(once(Array::Scalar(a)).chain(b.into_iter()).collect())
+            }
+            (Array::Vector(a), Array::Scalar(b)) => {
+                Array::Vector(a.into_iter().chain(once(Array::Scalar(b))).collect())
+            }
+            (Array::Vector(a), Array::Vector(b)) => {
+                Array::Vector(a.into_iter().chain(b.into_iter()).collect())
             }
         }
     }

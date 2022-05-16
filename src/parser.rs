@@ -69,6 +69,9 @@ where
         token(Token::Minus).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::Minus)),
         token(Token::Times).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::Times)),
         token(Token::Divide).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::Divide)),
+        token(Token::LeftTack).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::LeftTack)),
+        token(Token::RightTack).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::RightTack)),
+        token(Token::Comma).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::Comma)),
         token(Token::TildeDiaeresis)
             .map(|_| Expr::PrimitiveMonadicOperator(PrimitiveMonadicOperator::Commute)),
     ))

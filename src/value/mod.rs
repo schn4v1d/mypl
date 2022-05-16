@@ -20,7 +20,7 @@ impl Display for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Value::Array(a) => write!(f, "{}", a),
-            Value::Function(_) => todo!(),
+            Value::Function(x) => write!(f, "{}", x),
         }
     }
 }
@@ -77,8 +77,15 @@ pub fn eval(tree: &EvalTree) -> Value {
         EvalTree::MonadicOperatorApplication(_, _) => todo!(),
         EvalTree::BoundRightOperand(_, _) => todo!(),
         EvalTree::DyadicOperatorApplication(_, _, _) => todo!(),
-        EvalTree::Atop(_, _) => todo!(),
-        EvalTree::Fork(_, _, _) => todo!(),
+        EvalTree::Atop(f, g) => Value::Function(Function::Atop(
+            Box::new(eval(f).as_function()),
+            Box::new(eval(g).as_function()),
+        )),
+        EvalTree::Fork(f, g, h) => Value::Function(Function::Fork(
+            Box::new(eval(f).as_function()),
+            Box::new(eval(g).as_function()),
+            Box::new(eval(h).as_function()),
+        )),
         EvalTree::Integer(i) => Value::Array(Array::Scalar(Scalar::Integer(*i))),
         EvalTree::Float(f) => Value::Array(Array::Scalar(Scalar::Float(*f))),
         EvalTree::PrimitiveFunction(p) => Value::Function(Function::Primitive(*p)),

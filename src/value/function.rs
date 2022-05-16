@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::primitives::PrimitiveFunction;
 
 use super::array::{scalar::Scalar, Array};
@@ -5,6 +7,8 @@ use super::array::{scalar::Scalar, Array};
 #[derive(Debug)]
 pub enum Function {
     Primitive(PrimitiveFunction),
+    Atop(Box<Function>, Box<Function>),
+    Fork(Box<Function>, Box<Function>, Box<Function>),
 }
 
 impl Function {
@@ -39,7 +43,37 @@ impl Function {
                         omega.pervade(|x| x.reciprocal())
                     }
                 }
+                PrimitiveFunction::LeftTack => {
+                    if let Some(alpha) = alpha {
+                        alpha
+                    } else {
+                        omega
+                    }
+                }
+                PrimitiveFunction::RightTack => omega,
+                PrimitiveFunction::Comma => {
+                    if let Some(alpha) = alpha {
+                        Array::catenate(alpha, omega)
+                    } else {
+                        omega.ravel()
+                    }
+                }
             },
+            Function::Atop(f, g) => f.apply(None, g.apply(alpha, omega)),
+            Function::Fork(f, g, h) => g.apply(
+                Some(f.apply(alpha.clone(), omega.clone())),
+                h.apply(alpha, omega),
+            ),
+        }
+    }
+}
+
+impl Display for Function {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Function::Primitive(p) => write!(f, "{}", p),
+            Function::Atop(a, b) => write!(f, "{}{}", a, b),
+            Function::Fork(a, b, c) => write!(f, "{}{}{}", a, b, c),
         }
     }
 }

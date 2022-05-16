@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use logos::{Lexer, Logos};
 
 #[derive(Debug, Clone, Copy, PartialEq, Logos)]
@@ -25,6 +27,14 @@ pub enum Token {
     #[token("÷")]
     #[token("`=")]
     Divide,
+    #[token("⊣")]
+    #[token("`|")]
+    LeftTack,
+    #[token("⊢")]
+    #[token("`\\")]
+    RightTack,
+    #[token(",")]
+    Comma,
 
     // Primitive Operators
     #[token("⍨")]
@@ -34,6 +44,39 @@ pub enum Token {
     #[error]
     #[regex(r"[ \t]+", logos::skip)]
     Error,
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, " ")?;
+        match self {
+            Token::Integer(n) => {
+                if *n < 0 {
+                    write!(f, "¯{}", n.abs())
+                } else {
+                    write!(f, "{}", n)
+                }
+            }
+            Token::Float(n) => {
+                if *n < 0.0 {
+                    write!(f, "¯{}", n.abs())
+                } else {
+                    write!(f, "{}", n)
+                }
+            }
+            Token::LParens => write!(f, "("),
+            Token::RParens => write!(f, ")"),
+            Token::Plus => write!(f, "+"),
+            Token::Minus => write!(f, "-"),
+            Token::Times => write!(f, "×"),
+            Token::Divide => write!(f, "÷"),
+            Token::LeftTack => write!(f, "⊣"),
+            Token::RightTack => write!(f, "⊢"),
+            Token::Comma => write!(f, ","),
+            Token::TildeDiaeresis => write!(f, "⍨"),
+            Token::Error => Ok(()),
+        }
+    }
 }
 
 fn parse_integer(lex: &mut Lexer<Token>) -> Option<i64> {

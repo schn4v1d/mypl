@@ -44,14 +44,14 @@ impl Scalar {
         match self {
             Scalar::Integer(i) => Scalar::Float(1.0 / *i as f64).round_whole(),
             Scalar::Float(f) => Scalar::Float(1.0 / *f).round_whole(),
-            Scalar::Array(a) => Scalar::Array(Box::new(a.pervade(|x| x.round_whole()))),
+            Scalar::Array(a) => Scalar::Array(Box::new(a.pervade(|x| x.reciprocal()))),
         }
     }
 
     pub fn signum(&self) -> Scalar {
         match self {
-            Scalar::Integer(i) => Scalar::Integer(if *i >= 0 { 1 } else { 0 }),
-            Scalar::Float(f) => Scalar::Integer(if *f >= 0.0 { 1 } else { 0 }),
+            Scalar::Integer(i) => Scalar::Integer(if *i >= 0 { 1 } else { -1 }),
+            Scalar::Float(f) => Scalar::Integer(if *f >= 0.0 { 1 } else { -1 }),
             Scalar::Array(a) => Scalar::Array(Box::new(a.pervade(|x| x.signum()))),
         }
     }

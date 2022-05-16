@@ -23,6 +23,11 @@ fn main() {
     for line in stdin.lock().lines() {
         let tokens = Token::lexer(&line.unwrap()).collect::<Vec<_>>();
 
+        for token in &tokens {
+            print!("{}", token);
+        }
+        println!();
+
         // println!("{:#?}", tokens);
 
         let expressions = parse(&tokens);
