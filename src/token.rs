@@ -3,9 +3,9 @@ use logos::{Lexer, Logos};
 #[derive(Debug, Clone, Copy, PartialEq, Logos)]
 pub enum Token {
     // Atoms
-    #[regex(r"¯?[0-9]+", parse_integer)]
+    #[regex(r"[¯_]?[0-9]+", parse_integer)]
     Integer(i64),
-    #[regex(r"¯?[0-9]+\\.[0-9]+", parse_float)]
+    #[regex(r"[¯_]?[0-9]+\.[0-9]+", parse_float)]
     Float(f64),
 
     // Symbols
@@ -20,8 +20,10 @@ pub enum Token {
     #[token("-")]
     Minus,
     #[token("×")]
+    #[token("`-")]
     Times,
     #[token("÷")]
+    #[token("`=")]
     Divide,
 
     // Primitive Operators
@@ -32,19 +34,6 @@ pub enum Token {
     #[error]
     #[regex(r"[ \t]+", logos::skip)]
     Error,
-}
-
-impl Token {
-    fn is_function(&self) -> bool {
-        matches!(
-            self,
-            Token::Plus | Token::Minus | Token::Times | Token::Divide
-        )
-    }
-
-    fn is_operator(&self) -> bool {
-        matches!(self, Token::TildeDiaeresis)
-    }
 }
 
 fn parse_integer(lex: &mut Lexer<Token>) -> Option<i64> {

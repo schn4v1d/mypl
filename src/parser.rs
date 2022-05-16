@@ -1,11 +1,15 @@
 use combine::{
-    between, choice, parser, satisfy, token, EasyParser, ParseError, Parser, RangeStream, Stream,
+    between, choice, many1, parser, satisfy, token, EasyParser, ParseError, Parser, Stream,
 };
 
-use crate::{expr::Expr, token::Token};
+use crate::{
+    expr::Expr,
+    primitives::{PrimitiveFunction, PrimitiveMonadicOperator},
+    token::Token,
+};
 
-pub fn read(input: &[Token]) {
-    expr().easy_parse(input).unwrap();
+pub fn parse(input: &[Token]) -> Vec<Expr> {
+    many1(expr()).easy_parse(input).map(|x| x.0).unwrap()
 }
 
 fn parenthesized<I>() -> impl Parser<I, Output = Expr>
@@ -13,8 +17,8 @@ where
     I: Stream<Token = Token>,
     I::Error: ParseError<I::Token, I::Range, I::Position>,
 {
-    between(token(Token::LParens), token(Token::RParens), expr())
-        .map(|e| Expr::Isolated(Box::new(e)))
+    between(token(Token::LParens), token(Token::RParens), many1(expr()))
+        .map(|es| Expr::Isolated(es))
 }
 
 fn expr<I>() -> impl Parser<I, Output = Expr>
@@ -54,4 +58,19 @@ where
     });
 
     choice((integer, float))
+}
+
+fn primitive<I>() -> impl Parser<I, Output = Expr>
+where
+    I: Stream<Token = Token>,
+    I::Error: ParseError<I::Token, I::Range, I::Position>,
+{
+    choice((
+        token(Token::Plus).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::Plus)),
+        token(Token::Minus).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::Minus)),
+        token(Token::Times).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::Times)),
+        token(Token::Divide).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::Divide)),
+        token(Token::TildeDiaeresis)
+            .map(|_| Expr::PrimitiveMonadicOperator(PrimitiveMonadicOperator::Commute)),
+    ))
 }
