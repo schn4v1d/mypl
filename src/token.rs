@@ -39,7 +39,7 @@ pub enum Token {
 fn parse_integer(lex: &mut Lexer<Token>) -> Option<i64> {
     let slice = lex.slice();
 
-    let (negative, n): (bool, i64) = if slice.starts_with('¯') {
+    let (negative, n): (bool, i64) = if slice.starts_with('¯') || slice.starts_with('_') {
         (true, slice[1..].parse().ok()?)
     } else {
         (false, slice.parse().ok()?)
@@ -51,7 +51,7 @@ fn parse_integer(lex: &mut Lexer<Token>) -> Option<i64> {
 fn parse_float(lex: &mut Lexer<Token>) -> Option<f64> {
     let slice = lex.slice();
 
-    let (negative, n): (bool, f64) = if slice.starts_with('¯') {
+    let (negative, n): (bool, f64) = if slice.starts_with('¯') || slice.starts_with('_') {
         (true, slice[1..].parse().ok()?)
     } else {
         (false, slice.parse().ok()?)
