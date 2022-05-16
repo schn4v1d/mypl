@@ -6,13 +6,13 @@ enum BindingType {
     A,
     F,
     H,
-    AF,
-    MOP,
-    DOP,
-    JOT,
-    DOT,
-    REF,
-    IDX,
+    Af,
+    Mop,
+    Dop,
+    Jot,
+    Dot,
+    Ref,
+    Idx,
 }
 
 impl BindingType {
@@ -25,17 +25,17 @@ impl BindingType {
             Function(_) => F,
             MonadicFunctionApplication(_, _) => A,
             DyadicFunctionApplication(_, _, _) => A,
-            BoundLeftArgument(_, _) => AF,
+            BoundLeftArgument(_, _) => Af,
             MonadicOperatorApplication(_, _) => F,
-            BoundRightOperand(_, _) => MOP,
+            BoundRightOperand(_, _) => Mop,
             DyadicOperatorApplication(_, _, _) => F,
             Atop(_, _) => F,
             Fork(_, _, _) => F,
             Integer(_) => A,
             Float(_) => F,
             PrimitiveFunction(_) => F,
-            PrimitiveMonadicOperator(_) => MOP,
-            PrimitiveDyadicOperator(_) => DOP,
+            PrimitiveMonadicOperator(_) => Mop,
+            PrimitiveDyadicOperator(_) => Dop,
             Unfinished(_) => todo!(),
         }
     }
@@ -55,9 +55,11 @@ fn combine_arrays(x: EvalTree, y: EvalTree) -> EvalTree {
 fn combine_functions(x: EvalTree, y: EvalTree) -> EvalTree {
     use EvalTree::*;
 
-    match (x, y) {
-        _ => todo!(),
-    }
+    // match (x, y) {
+    //     _ => todo!(),
+    // }
+
+    todo!()
 }
 
 pub fn combine(x: EvalTree, y: EvalTree) -> EvalTree {
@@ -70,34 +72,34 @@ pub fn combine(x: EvalTree, y: EvalTree) -> EvalTree {
     match (bx, by) {
         (A, A) => combine_arrays(x, y),
         (A, F) | (A, H) => BoundLeftArgument(Box::new(x), Box::new(y)),
-        (A, MOP) | (F, MOP) | (H, MOP) | (JOT, MOP) => {
+        (A, Mop) | (F, Mop) | (H, Mop) | (Jot, Mop) => {
             MonadicOperatorApplication(Box::new(x), Box::new(y))
         }
-        (A, DOT) => todo!(),
-        (A, IDX) => todo!(),
+        (A, Dot) => todo!(),
+        (A, Idx) => todo!(),
         (F, A) => MonadicFunctionApplication(Box::new(x), Box::new(y)),
         (F, F) => combine_functions(x, y),
         (F, H) => combine_functions(x, y),
-        (F, DOT) => todo!(),
-        (F, IDX) => todo!(),
+        (F, Dot) => todo!(),
+        (F, Idx) => todo!(),
         (H, F) => todo!(),
         (H, H) => todo!(),
-        (H, AF) => todo!(),
-        (AF, A) => {
+        (H, Af) => todo!(),
+        (Af, A) => {
             if let BoundLeftArgument(l, f) = x {
                 DyadicFunctionApplication(l, f, Box::new(y))
             } else {
                 unreachable!()
             }
         }
-        (AF, F) => todo!(),
-        (DOP, A) | (DOP, F) | (DOP, H) | (JOT, A) | (JOT, F) | (JOT, H) | (DOT, F) | (DOT, H) => {
+        (Af, F) => todo!(),
+        (Dop, A) | (Dop, F) | (Dop, H) | (Jot, A) | (Jot, F) | (Jot, H) | (Dot, F) | (Dot, H) => {
             BoundRightOperand(Box::new(x), Box::new(y))
         }
-        (REF, _) => todo!(),
-        (IDX, _) => todo!(),
-        (_, REF) => todo!(),
-        (_, IDX) => todo!(),
+        (Ref, _) => todo!(),
+        (Idx, _) => todo!(),
+        (_, Ref) => todo!(),
+        (_, Idx) => todo!(),
         _ => panic!(),
     }
 }
@@ -115,40 +117,40 @@ fn binding_strength(x: &EvalTree, y: &EvalTree) -> u8 {
         (BindingType::A, BindingType::A) => 6,
         (BindingType::A, BindingType::F) => 3,
         (BindingType::A, BindingType::H) => 3,
-        (BindingType::A, BindingType::MOP) => 4,
-        (BindingType::A, BindingType::DOT) => 7,
-        (BindingType::A, BindingType::IDX) => 4,
+        (BindingType::A, BindingType::Mop) => 4,
+        (BindingType::A, BindingType::Dot) => 7,
+        (BindingType::A, BindingType::Idx) => 4,
         (BindingType::F, BindingType::A) => 2,
         (BindingType::F, BindingType::F) => 1,
         (BindingType::F, BindingType::H) => 4,
-        (BindingType::F, BindingType::MOP) => 4,
-        (BindingType::F, BindingType::IDX) => 4,
+        (BindingType::F, BindingType::Mop) => 4,
+        (BindingType::F, BindingType::Idx) => 4,
         (BindingType::H, BindingType::F) => 1,
         (BindingType::H, BindingType::H) => 4,
-        (BindingType::H, BindingType::MOP) => 4,
-        (BindingType::H, BindingType::IDX) => 4,
-        (BindingType::AF, BindingType::A) => 2,
-        (BindingType::AF, BindingType::F) => 1,
-        (BindingType::MOP, BindingType::H) => 4,
-        (BindingType::DOP, BindingType::A) => 5,
-        (BindingType::DOP, BindingType::F) => 5,
-        (BindingType::DOP, BindingType::H) => 5,
-        (BindingType::JOT, BindingType::A) => 5,
-        (BindingType::JOT, BindingType::F) => 5,
-        (BindingType::JOT, BindingType::H) => 5,
-        (BindingType::JOT, BindingType::MOP) => 4,
-        (BindingType::DOT, BindingType::A) => 6,
-        (BindingType::DOT, BindingType::F) => 5,
-        (BindingType::DOT, BindingType::H) => 5,
-        (BindingType::DOT, BindingType::DOP) => 6,
-        (BindingType::REF, BindingType::A) => 7,
-        (BindingType::REF, BindingType::F) => 7,
-        (BindingType::REF, BindingType::H) => 7,
-        (BindingType::REF, BindingType::MOP) => 7,
-        (BindingType::REF, BindingType::DOP) => 7,
-        (BindingType::IDX, BindingType::A) => 3,
-        (BindingType::IDX, BindingType::F) => 3,
-        (BindingType::IDX, BindingType::H) => 3,
+        (BindingType::H, BindingType::Mop) => 4,
+        (BindingType::H, BindingType::Idx) => 4,
+        (BindingType::Af, BindingType::A) => 2,
+        (BindingType::Af, BindingType::F) => 1,
+        (BindingType::Mop, BindingType::H) => 4,
+        (BindingType::Dop, BindingType::A) => 5,
+        (BindingType::Dop, BindingType::F) => 5,
+        (BindingType::Dop, BindingType::H) => 5,
+        (BindingType::Jot, BindingType::A) => 5,
+        (BindingType::Jot, BindingType::F) => 5,
+        (BindingType::Jot, BindingType::H) => 5,
+        (BindingType::Jot, BindingType::Mop) => 4,
+        (BindingType::Dot, BindingType::A) => 6,
+        (BindingType::Dot, BindingType::F) => 5,
+        (BindingType::Dot, BindingType::H) => 5,
+        (BindingType::Dot, BindingType::Dop) => 6,
+        (BindingType::Ref, BindingType::A) => 7,
+        (BindingType::Ref, BindingType::F) => 7,
+        (BindingType::Ref, BindingType::H) => 7,
+        (BindingType::Ref, BindingType::Mop) => 7,
+        (BindingType::Ref, BindingType::Dop) => 7,
+        (BindingType::Idx, BindingType::A) => 3,
+        (BindingType::Idx, BindingType::F) => 3,
+        (BindingType::Idx, BindingType::H) => 3,
         _ => panic!(),
     }
 }

@@ -17,8 +17,7 @@ where
     I: Stream<Token = Token>,
     I::Error: ParseError<I::Token, I::Range, I::Position>,
 {
-    between(token(Token::LParens), token(Token::RParens), many1(expr()))
-        .map(|es| Expr::Isolated(es))
+    between(token(Token::LParens), token(Token::RParens), many1(expr())).map(Expr::Isolated)
 }
 
 fn expr<I>() -> impl Parser<I, Output = Expr>

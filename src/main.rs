@@ -1,4 +1,4 @@
-use std::io::{stdout, BufRead, Write};
+use std::io::{BufRead, Write};
 
 use logos::Logos;
 use parser::parse;
