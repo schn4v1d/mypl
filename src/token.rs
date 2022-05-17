@@ -35,6 +35,9 @@ pub enum Token {
     RightTack,
     #[token(",")]
     Comma,
+    #[token("`e")]
+    #[token("∊")]
+    Epsilon,
 
     // Primitive Operators
     #[token("⍨")]
@@ -73,6 +76,7 @@ impl Display for Token {
             Token::LeftTack => write!(f, "⊣"),
             Token::RightTack => write!(f, "⊢"),
             Token::Comma => write!(f, ","),
+            Token::Epsilon => write!(f, "∊"),
             Token::TildeDiaeresis => write!(f, "⍨"),
             Token::Error => Ok(()),
         }

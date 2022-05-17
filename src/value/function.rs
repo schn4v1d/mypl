@@ -58,6 +58,7 @@ impl Function {
                         omega.ravel()
                     }
                 }
+                PrimitiveFunction::Epsilon => todo!(),
             },
             Function::Atop(f, g) => f.apply(None, g.apply(alpha, omega)),
             Function::Fork(f, g, h) => g.apply(

@@ -72,6 +72,7 @@ where
         token(Token::LeftTack).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::LeftTack)),
         token(Token::RightTack).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::RightTack)),
         token(Token::Comma).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::Comma)),
+        token(Token::Epsilon).map(|_| Expr::PrimitiveFunction(PrimitiveFunction::Epsilon)),
         token(Token::TildeDiaeresis)
             .map(|_| Expr::PrimitiveMonadicOperator(PrimitiveMonadicOperator::Commute)),
     ))

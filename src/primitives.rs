@@ -9,6 +9,7 @@ pub enum PrimitiveFunction {
     LeftTack,
     RightTack,
     Comma,
+    Epsilon,
 }
 
 impl Display for PrimitiveFunction {
@@ -21,6 +22,7 @@ impl Display for PrimitiveFunction {
             PrimitiveFunction::LeftTack => write!(f, "⊣"),
             PrimitiveFunction::RightTack => write!(f, "⊢"),
             PrimitiveFunction::Comma => write!(f, ","),
+            PrimitiveFunction::Epsilon => write!(f, "∊"),
         }
     }
 }
